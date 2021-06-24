@@ -1,0 +1,47 @@
+---
+
+global:
+  writeToFile: true
+  metricsDirectory: collected-metrics
+  measurements:
+    - name: podLatency
+      esIndex: kube-burner
+
+  indexerConfig:
+    enabled: {{ .ES_ENABLE }}
+    esServers: [{{ .ES_SERVER }}]
+    insecureSkipVerify: true
+    defaultIndex: {{ .ES_INDEX }}
+    type: elastic
+
+jobs:
+  - name: delete-old-resources
+    jobType: delete
+    jobPause: 10s
+    qps: {{ .QPS }}
+    burst: {{ .BURST }}
+    waitForDeletion: true
+    objects:
+    - kind: Pod
+      labelSelector: {app: mb-pod}
+        
+  - name: mb-pod
+    jobType: create
+    jobIterations: 1
+    qps: {{ .QPS }}
+    burst: {{ .BURST }}
+    namespacedIterations: false
+    cleanup: false
+    namespace: web-server-mb-1
+    podWait: false
+    waitWhenFinished: true
+    waitFor: ["Pod"]
+    verifyObjects: true
+    errorOnVerify: false 
+    jobIterationDelay: 0s
+    objects:
+      - objectTemplate: templates/pod2.yml
+        replicas: 1
+        inputVars:
+          containerImage: {{ .MB_CONTAINER_IMAGE }}
+          duration: {{ .MB_DURATION }}

@@ -1,0 +1,15 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: web-server-{{.Replica}}
+  labels:
+    app: web-server-{{.Replica}}
+    group: kb-mb-wl
+spec:
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""
+  containers:
+  - name: nginx
+    image: {{ .containerImage }}
+    ports:
+    imagePullPolicy: IfNotPresent

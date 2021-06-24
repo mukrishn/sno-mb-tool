@@ -1,0 +1,35 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: mb-pod-1
+  labels:
+    group: kb-mb-wl
+    app: mb-pod
+spec:
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""
+  containers:
+  - name: mb
+    image: {{ .containerImage }}
+    command: ["/bin/sh", "-c"]
+    args:
+    - mb -i request.json -d{{ .duration }} && sleep 30
+    ports:
+    imagePullPolicy: IfNotPresent
+    securityContext:
+      privileged: true
+    resources:
+      limits:
+        memory: '1000Mi'
+        cpu: 6
+      requests:
+        memory: '1000Mi'
+        cpu: 6
+    volumeMounts:
+    - name: request
+      mountPath: /data/
+  volumes:
+  - name: request
+    configMap:
+      name: request-json
+      defaultMode: 0777    
