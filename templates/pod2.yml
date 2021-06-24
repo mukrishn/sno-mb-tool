@@ -20,10 +20,10 @@ spec:
       privileged: true
     resources:
       limits:
-        memory: '1000Mi'
+        memory: '2000Mi'
         cpu: 6
       requests:
-        memory: '1000Mi'
+        memory: '2000Mi'
         cpu: 6
     volumeMounts:
     - name: request
