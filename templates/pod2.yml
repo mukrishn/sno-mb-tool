@@ -13,7 +13,7 @@ spec:
     image: {{ .containerImage }}
     command: ["/bin/sh", "-c"]
     args:
-    - mb -i request.json -d{{ .duration }} && sleep 30
+    - mb -i request.json -d{{ .duration }}
     ports:
     imagePullPolicy: IfNotPresent
     securityContext:
@@ -33,3 +33,4 @@ spec:
     configMap:
       name: request-json
       defaultMode: 0777    
+  restartPolicy: OnFailure
