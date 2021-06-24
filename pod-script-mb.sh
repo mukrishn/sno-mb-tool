@@ -60,10 +60,6 @@ cat <<EOT >> configmap.yml
           "port": 8080,
           "method": "GET",
           "path": "/$fs.html",
-          "delay": {
-            "min": 1000,
-            "max": 2000
-          },
           "keep-alive-requests": $kp,
           "clients": $mb
         },

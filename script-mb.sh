@@ -59,10 +59,6 @@ cat <<EOT >> request.json
     "port": $port,
     "method": "GET",
     "path": "/$fs.html",
-    "delay": {
-      "min": 1000,
-      "max": 2000
-    },
     "keep-alive-requests": $kp,
     "clients": $mb
   },
