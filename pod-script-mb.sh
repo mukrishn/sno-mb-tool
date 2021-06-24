@@ -75,10 +75,11 @@ echo "---------------------STARTING MB-------------------------"
 kube-burner init -c mb_pod.yml --uuid $uuid 
 sleep $MB_DURATION 
 sleep 20
-pod_log=$(oc logs -n web-server-mb-1 mb-pod-1)
-echo $pod_log
 echo "---------------------Summary-----------------------------"
-echo $pod_log | grep "Hits: "
+oc logs -n web-server-mb-1 mb-pod-1 | grep "Time: "
+oc logs -n web-server-mb-1 mb-pod-1 | grep "Sent: "
+oc logs -n web-server-mb-1 mb-pod-1 | grep "Recv: "
+oc logs -n web-server-mb-1 mb-pod-1 | grep "Hits: "
 echo "---------------------FINISHED MB-------------------------"
 endtime=$(date +%s%N | cut -b1-13)
 
