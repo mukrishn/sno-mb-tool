@@ -81,6 +81,8 @@ sleep $MB_DURATION
 sleep 20
 pod_log=$(oc logs -n web-server-mb-1 mb-pod-1)
 echo $pod_log
+echo "---------------------Summary-----------------------------"
+echo $pod_log | grep "Hits: "
 echo "---------------------FINISHED MB-------------------------"
 endtime=$(date +%s%N | cut -b1-13)
 
