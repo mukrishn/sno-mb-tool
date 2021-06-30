@@ -70,7 +70,7 @@ echo '     ]' >> configmap.yml
 oc apply -f configmap.yml
 
 starttime=$(date +%s%N | cut -b1-13)
-echo "Run $fs file $kp keepalive $mb mb clients for $MB_DURATION seconds per port"
+echo "Run $fs Byte GET on $pods pods and $kp keepalive $mb mb clients for $MB_DURATION seconds per pod"
 echo "---------------------STARTING MB-------------------------"
 kube-burner init -c mb_pod.yml --uuid $uuid 
 sleep $MB_DURATION 
@@ -88,7 +88,7 @@ echo "---------------------FINISHED MB-------------------------"
 
 for i in {1..5}
 do
-curl -H "Content-Type: application/json" -X POST -d "{\"dashboardId\":$i,\"time\":$starttime,\"isRegion\":\"true\",\"timeEnd\":$endtime,\"tags\":[\"mb-test\"],\"text\":\"data plane test running HTTP GETs on $((pods*ns)) OCP routes, $kp keepalive connection & $mb mb client per route for $MB_DURATION seconds and downloading $fs Bytes file\"}" http://admin:admin@$target/api/annotations
+curl -H "Content-Type: application/json" -X POST -d "{\"dashboardId\":$i,\"time\":$starttime,\"isRegion\":\"true\",\"timeEnd\":$endtime,\"tags\":[\"mb-test\"],\"text\":\"data plane test running HTTP GETs on $((pods*ns)) OCP pods, $kp keepalive connection & $mb mb client per pod for $MB_DURATION seconds and downloading $fs Bytes file\"}" http://admin:admin@$target/api/annotations
 done
 
 echo "--"
