@@ -32,7 +32,7 @@ do
 podips=""
 while [ "$podips" == "" ]
 do
-podips=$(oc get pods --no-headers -n web-server-mb-1 -o wide | awk '{print $6}')
+podips=$(oc get pods --no-headers -n web-server-mb-1 -l app=web-server-$pods -o wide | awk '{print $6}')
 done
 
 echo "---------------------Creating request.json---------------"
