@@ -16,7 +16,7 @@ export NUMBER_OF_NS_LIST=(1)
 export PODS_PER_NS_LIST=(1 10 100)
 # container image
 export CONTAINER_IMAGE="quay.io/openshift-scale/nginx"
-export MB_CONTAINER_IMAGE="quay.io/mukrishn/snomb:1"
+export MB_CONTAINER_IMAGE="quay.io/mukrishn/snomb:2"
 
 # MB inputs
 # duration of mb script execution
@@ -24,5 +24,5 @@ export MB_DURATION="300"
 # mb client counts
 export KEEPALIVE_COUNT=(1 10 100)
 export NUMBER_OF_MB_CLIENT=(1 10 100 1000)
-export HTTP_RESPONSE_SIZE_LIST=(128 256 1024 16384)
+export HTTP_RESPONSE_SIZE_LIST=(128 1024 8192 16384)
 

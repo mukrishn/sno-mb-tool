@@ -70,9 +70,10 @@ starttime=$(date +%s%N | cut -b1-13)
 echo "Run $fs file $kp keepalive $mb mb clients for $MB_DURATION seconds per port"
 echo "---------------------STARTING MB-------------------------"
 podman run -v /root/sno-mb-tool:/data -it $MB_CONTAINER_IMAGE -i request.json -d$MB_DURATION
-
-echo "---------------------FINISHED MB-------------------------"
 endtime=$(date +%s%N | cut -b1-13)
+echo "---------------------Summary-----------------------------"
+python3 parser.py --output response.csv --runtime $MB_DURATION
+echo "---------------------FINISHED MB-------------------------"
 
 
 for i in {1..5}

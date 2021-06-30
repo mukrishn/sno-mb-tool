@@ -13,7 +13,7 @@ spec:
     image: {{ .containerImage }}
     command: ["/bin/sh", "-c"]
     args:
-    - mb -i request.json -d{{ .duration }}
+    - mb -i request.json -d{{ .duration }} -o /tmp/response.csv && sleep 30
     ports:
     imagePullPolicy: IfNotPresent
     securityContext:
