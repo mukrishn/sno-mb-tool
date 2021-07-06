@@ -5,6 +5,7 @@
 * Install [Dittybopper](https://github.com/cloud-bulldozer/performance-dashboards)
 * Install OC clients and set `KUBECONFIG` environment variable 
 * Install podman
+* pip3 install numpy
 
 ## Run scripts
 
