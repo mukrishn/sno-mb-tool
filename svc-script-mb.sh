@@ -1,0 +1,111 @@
+#!/usr/bin/env bash 
+set -e
+
+source env.sh
+
+for fs in ${HTTP_RESPONSE_SIZE_LIST[@]}
+do
+for ns in ${NUMBER_OF_NS_LIST[@]}
+do
+for pods in ${PODS_PER_NS_LIST[@]}
+do
+
+target=""
+while [ "$target" == "" ]
+do
+target=$(oc get --no-headers route -n dittybopper | awk {'print $2'})
+done
+
+uuid=$(uuidgen)
+
+export NUMBER_OF_NS=$ns
+export PODS_PER_NS=$pods
+
+echo "---------------------STARTING KB-------------------------"
+kube-burner init -c mb_test.yml --uuid $uuid 
+
+for kp in ${KEEPALIVE_COUNT[@]}
+do
+for mb in ${NUMBER_OF_MB_CLIENT[@]}
+do
+
+node_hostname=""
+node_port=""
+while [ "$node_hostname" == "" ]
+do
+node_hostname=$(oc get nodes --no-headers | awk '{print $1}')
+done
+while [ "$node_port" == "" ]
+do
+node_port=$(oc get service --no-headers -A -l group=kb-mb-wl | awk '{print $6}' | awk -F':' '{print $2}' | awk -F'/' '{print $1}')
+done
+
+node_ip=$(nslookup $node_hostname | grep Address | grep -v 10.1.36.89 | awk '{print $2}')
+
+echo "---------------------Creating request.json---------------"
+
+cat <<EOT >> configmap.yml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: request-json
+  namespace: web-server-mb-1
+  labels:
+    group: kb-mb-wl
+    app: mb-pod
+data:
+  request.json: |
+     [
+EOT
+
+for port in $node_port
+do
+cat <<EOT >> configmap.yml
+        {
+          "scheme": "http",
+          "host": "$node_ip",
+          "port": $port,
+          "method": "GET",
+          "path": "/$fs.html",
+          "keep-alive-requests": $kp,
+          "clients": $mb
+        },
+EOT
+done
+echo '     ]' >> configmap.yml
+
+oc apply -f configmap.yml
+
+starttime=$(date +%s%N | cut -b1-13)
+echo "Run $fs Byte GET on $pods pods and $kp keepalive $mb mb clients for $MB_DURATION seconds per pod"
+echo "---------------------STARTING MB-------------------------"
+kube-burner init -c mb_pod.yml --uuid $uuid 
+sleep $MB_DURATION 
+sleep 10
+endtime=$(date +%s%N | cut -b1-13)
+echo "---------------------Summary-----------------------------"
+oc logs -n web-server-mb-1 mb-pod-1 | grep "Time: "
+oc logs -n web-server-mb-1 mb-pod-1 | grep "Sent: "
+oc logs -n web-server-mb-1 mb-pod-1 | grep "Recv: "
+oc logs -n web-server-mb-1 mb-pod-1 | grep "Hits: "
+oc cp -n web-server-mb-1 mb-pod-1:/tmp/response.csv response.csv
+python3 parser.py --output response.csv --runtime $MB_DURATION
+echo "---------------------FINISHED MB-------------------------"
+
+
+for i in {1..5}
+do
+curl -H "Content-Type: application/json" -X POST -d "{\"dashboardId\":$i,\"time\":$starttime,\"isRegion\":\"true\",\"timeEnd\":$endtime,\"tags\":[\"mb-test\"],\"text\":\"data plane test running HTTP GETs on $((pods*ns)) OCP pods, $kp keepalive connection & $mb mb client per pod for $MB_DURATION seconds and downloading $fs Bytes file\"}" http://admin:admin@$target/api/annotations
+done
+
+echo "--"
+echo "---------------------FINISHED KB-------------------------"
+sleep 60
+done
+sleep 60
+done
+sleep 60
+done
+done
+sleep 60
+done
