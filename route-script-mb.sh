@@ -29,18 +29,11 @@ do
 for mb in ${NUMBER_OF_MB_CLIENT[@]}
 do
 
-node_hostname=""
-node_port=""
-while [ "$node_hostname" == "" ]
+routes=""
+while [ "$routes" == "" ]
 do
-node_hostname=$(oc get nodes --no-headers | awk '{print $1}')
+routes=$(oc get routes -A -l group=kb-mb-wl --no-headers | awk '{print $3}')
 done
-while [ "$node_port" == "" ]
-do
-node_port=$(oc get service --no-headers -A -l group=kb-mb-wl | awk '{print $6}' | awk -F':' '{print $2}' | awk -F'/' '{print $1}')
-done
-
-node_ip=$(nslookup $node_hostname | grep Address | grep -v 10.1.36.89 | awk '{print $2}')
 
 echo "---------------------Creating request.json---------------"
 
@@ -58,13 +51,13 @@ data:
      [
 EOT
 
-for port in $node_port
+for route in $routes
 do
 cat <<EOT >> configmap.yml
         {
           "scheme": "http",
-          "host": "$node_ip",
-          "port": $port,
+          "host": "$route",
+          "port": 80,
           "method": "GET",
           "path": "/$fs.html",
           "keep-alive-requests": $kp,

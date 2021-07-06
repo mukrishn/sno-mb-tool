@@ -1,0 +1,13 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: http-{{.Replica}}
+    group: kb-mb-wl
+  name: web-service-{{.Replica}}        
+spec:
+  port:
+    targetPort: http
+  to:
+    kind: Service
+    name: web-service-{{.Replica}}

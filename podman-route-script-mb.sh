@@ -29,7 +29,7 @@ export NUMBER_OF_NS=$ns
 export PODS_PER_NS=$pods
 
 echo "---------------------STARTING KB-------------------------"
-#kube-burner init -c mb_test.yml --uuid $uuid 
+kube-burner init -c mb_test.yml --uuid $uuid 
 
 for kp in ${KEEPALIVE_COUNT[@]}
 do
@@ -39,24 +39,20 @@ do
 echo "---------------------Creating request.json---------------"
 echo '[' > request.json
 
-node_hostname=""
-node_port=""
-while [ "$node_hostname" == "" ]
+routes=""
+while [ "$routes" == "" ]
 do
-node_hostname=$(oc get nodes --no-headers | awk '{print $1}')
-done
-while [ "$node_port" == "" ]
-do
-node_port=$(oc get service --no-headers -A -l group=kb-mb-wl | awk '{print $6}' | awk -F':' '{print $2}' | awk -F'/' '{print $1}')
+routes=$(oc get routes -A -l group=kb-mb-wl --no-headers | awk '{print $3}')
 done
 
-for port in $node_port
+
+for route in $routes
 do
 cat <<EOT >> request.json       
   {
     "scheme": "http",
-    "host": "$node_hostname",
-    "port": $port,
+    "host": "$route",
+    "port": 80,
     "method": "GET",
     "path": "/$fs.html",
     "keep-alive-requests": $kp,
@@ -69,12 +65,11 @@ echo ']' >> request.json
 starttime=$(date +%s%N | cut -b1-13)
 echo "Run $fs file $kp keepalive $mb mb clients for $MB_DURATION seconds per port"
 echo "---------------------STARTING MB-------------------------"
-podman run -v /root/sno-mb-tool:/data -it $MB_CONTAINER_IMAGE -i request.json -d$MB_DURATION
+podman run -v /root/sno-mb-tool:/data -it snomb:1 -i request.json -d$MB_DURATION -o response.csv
 endtime=$(date +%s%N | cut -b1-13)
 echo "---------------------Summary-----------------------------"
 python3 parser.py --output response.csv --runtime $MB_DURATION
 echo "---------------------FINISHED MB-------------------------"
-
 
 for i in {1..5}
 do
