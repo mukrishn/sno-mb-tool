@@ -29,7 +29,7 @@ export NUMBER_OF_NS=$ns
 export PODS_PER_NS=$pods
 
 echo "---------------------STARTING KB-------------------------"
-#kube-burner init -c mb_test.yml --uuid $uuid 
+kube-burner init -c mb_test.yml --uuid $uuid 
 
 for kp in ${KEEPALIVE_COUNT[@]}
 do
