@@ -1,0 +1,13 @@
+---
+apiVersion: machineconfiguration.openshift.io/v1
+kind: KubeletConfig
+metadata:
+ name: custom-kubelet
+spec:
+ machineConfigPoolSelector:
+  matchLabels:
+     machineconfiguration.openshift.io/mco-built-in: ""
+ kubeletConfig:
+  allowedUnsafeSysctls: 
+   - "net.ipv4.tcp_tw_reuse"
+   - "net.netfilter.nf_conntrack_tcp_timeout_time_wait"
