@@ -14,5 +14,8 @@
     * kube-burner inputs
     * MB inputs
     * scale inputs - namespace and pod count
-* Run Script `script-mb.sh` to run HTTP traffic between localhost(mb client runs inside podman containers) and webserver pod via ingress routes
-* Run Script `pod-script-mb.sh` to run HTTP traffic between webserver pod and mb pod within OCP cluster. 
+* `podman-route-script-mb.sh` - Traffic via ingress route between podman container(on prov) and pods inside cluster
+* `podman-svc-script-mb.sh` - Traffic via service between podman container(on prov) and pods inside cluster
+* `route-script-mb.sh` - pod to pod traffic via ingress route
+* `svc-script-mb.sh` - pod to pod traffic via service network
+* `pod-script-mb.sh` - pod to pod direct traffic
